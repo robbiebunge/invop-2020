@@ -127,16 +127,19 @@ for i in range(1, nSim):
         tTicks = tTicks[0:nSim]
         break
 
-print(tTicks)
-print(nSim)
-print(nPersonas.size)
+# Calcular el numero promedio de personas en el sistema y en la cola
+nPersonasCola = np.maximum(nPersonas - s, 0)
+L  = (1/T) * np.sum(nPersonas[0:-1] * np.diff(tTicks))
+Lq = (1/T) * np.sum(nPersonasCola[0:-1] * np.diff(tTicks))
+
+print('L = ' + str(L))
+print('Lq = ' + str(Lq))
 
 plt.figure()
 plt.bar(tTicks,nPersonas)
 plt.xlabel('Tiempo (min)')
 plt.ylabel('Numero de personas')
 plt.show()
-
     
 
 
