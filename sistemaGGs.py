@@ -40,6 +40,7 @@ nSim = 200
 tTicks = np.zeros(nSim)
 nPersonas = np.zeros(nSim)
 serversOcupados = np.zeros(s)
+tServicioServers = np.zeros(s)
 
 # Inicializar sistema
 nPersonas[0] = 0
@@ -49,8 +50,8 @@ proximoEvento = 'arribo'
 tProximoEvento = generarEventoDiscreto(probArribos)
 nPersonasArribadas = 0
 serverServicio = 0
-tServicioServers = np.zeros(s)
 tServicioServers[:] = np.inf
+serverCompletaServicio = 0
 
 # Definir funciones auxiliares
 def agregarPersonaACola(nCola, cabeceraCola, nPersonasArribadas):
@@ -68,12 +69,12 @@ def sacarPersonaACola(nCola, cabeceraCola):
 	return nCola, cabeceraCola
 
 def asignarPersonaASever(serversOcupados, tServicioServers, ti):
-    jServersDesocupados = np.argwhere(serversOcupados == 0)
-    nServersDesocupados = np.sum(serversOcupados == 0)
-    serverAOcupar = np.random.randint(nServersDesocupados)
-    serverAOcupar = jServersDesocupados[serverAOcupar]
-    serversOcupados[serverAOcupar] = 1
-    tServicioServers[serverAOcupar] = ti + generarTiempoServicio()
+    jServersDesocupados = np.argwhere(serversOcupados == 0) # encontrar los indices de servers desocupados (recordad que los indices arrancan a contar desde 0!)
+    nServersDesocupados = np.sum(serversOcupados == 0)      # computar el numero de servers desocupados
+    serverAOcupar = np.random.randint(nServersDesocupados)  # elegir el indice de uno de los servers desocupados de manera aleatoria
+    serverAOcupar = jServersDesocupados[serverAOcupar]      # elegir el indice de uno de los servers desocupados de manera aleatoria (continued)
+    serversOcupados[serverAOcupar] = 1  # marcar el server como ocupado
+    tServicioServers[serverAOcupar] = ti + generarTiempoServicio()  # generar aleatoriamente el tiempo en que el server recien ocupado completara el servicio
 
     return serversOcupados, tServicioServers
 
@@ -85,7 +86,7 @@ for i in range(1, nSim):
 
     # Procesar evento
     if evento == 'arribo':
-        # Incrementar el numero de personas en el sistema y numero de personas arribadas
+        # Incrementar el numero de personas en el sistema y el numero de personas arribadas al sistema
         nPersonas[i] = nPersonas[i-1] + 1
         nPersonasArribadas = nPersonasArribadas + 1
 
@@ -95,7 +96,7 @@ for i in range(1, nSim):
         else : # arribado va a la cola
             nCola, cabeceraCola = agregarPersonaACola(nCola, cabeceraCola, nPersonasArribadas)
      
-        # generar el tiempo del proximo arribo
+        # generar aleatoriamente el tiempo del proximo arribo
         tProximoArribo = tTicks[i] + generarTiempoArribo()
 
     elif evento == 'servicio':
@@ -135,6 +136,7 @@ Lq = (1/T) * np.sum(nPersonasCola[0:-1] * np.diff(tTicks))
 print('L = ' + str(L))
 print('Lq = ' + str(Lq))
 
+# Graficar cantidad de personas en el sitema vs. tiempo
 plt.figure()
 plt.bar(tTicks,nPersonas)
 plt.xlabel('Tiempo (min)')
