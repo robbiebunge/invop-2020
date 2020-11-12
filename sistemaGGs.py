@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Definir la semilla 
-np.random.seed(0)
+#np.random.seed(0)
 
 # Definir funciones auxiliares
 def generarEventoDiscreto(probOutcomes):
@@ -59,11 +59,10 @@ def generarTiempoServicio():
     Tservicio = np.random.exponential(1/mu)
     return Tservicio
 
-
 def sim(s):
     # Definir parametros de la simulacion
-    T = 200
-    nSim = 5000
+    T = 20
+    nSim = 2000
     
     # Crear variables necesarias
     tTicks = np.zeros(nSim)
@@ -72,15 +71,16 @@ def sim(s):
     tServicioServers = np.zeros(s)
     
     # Inicializar sistema
-    nPersonas[0] = 0
+    nPersonasInicial = 0
+    nPersonas[0] = nPersonasInicial
     cabeceraCola = 0
-    nCola = max(nPersonas[0] - s, 0)
+    nCola = max(nPersonasInicial - s, 0)
     proximoEvento = 'arribo'
     tProximoEvento = generarTiempoArribo()
     nPersonasArribadas = 0
     tServicioServers[:] = np.inf
     serverCompletaServicio = 0
-    nServersOcupados = min(nPersonas[0], s)
+    nServersOcupados = min(nPersonasInicial, s)
     for i in range(int(nServersOcupados)):
         asignarPersonaASever(serversOcupados, tServicioServers, 0)
     
@@ -135,10 +135,9 @@ def sim(s):
             break
     
     # Calcular el numero promedio de personas en el sistema y en la cola
-    nWarmup = 0
     nPersonasCola = np.maximum(nPersonas - s, 0)
-    L  = (1/np.sum(np.diff(tTicks[nWarmup:]))) * np.sum(nPersonas[nWarmup:-1] * np.diff(tTicks[nWarmup:]))
-    Lq = (1/np.sum(np.diff(tTicks[nWarmup:]))) * np.sum(nPersonasCola[nWarmup:-1] * np.diff(tTicks[nWarmup:]))
+    L  = (1/T) * np.sum(nPersonas[:-1] * np.diff(tTicks))
+    Lq = (1/T) * np.sum(nPersonasCola[:-1] * np.diff(tTicks))
     
     # print('L = ' + str(L))
     # print('Lq = ' + str(Lq))
