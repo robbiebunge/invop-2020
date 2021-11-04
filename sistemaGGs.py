@@ -2,15 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Definir la semilla 
-#np.random.seed(0)
+np.random.seed(0)
+
+# Definir parametros del sistema
+landa = 4.5
+mu = 5
 
 # Definir funciones auxiliares
-def generarEventoDiscreto(probOutcomes):
-    x = np.random.uniform()
-    intervalosDeProb = np.cumsum(probOutcomes[:,1])
-    filaOutcome = np.digitize(x, intervalosDeProb)
-    outcome = probOutcomes[filaOutcome, 0]
-    return outcome
+# def generarEventoDiscreto(probOutcomes):
+#     x = np.random.uniform()
+#     intervalosDeProb = np.cumsum(probOutcomes[:,1])
+#     filaOutcome = np.digitize(x, intervalosDeProb)
+#     outcome = probOutcomes[filaOutcome, 0]
+#     return outcome
 
 def agregarPersonaACola(nCola, cabeceraCola, nPersonasArribadas):
     nCola = nCola + 1
@@ -36,19 +40,6 @@ def asignarPersonaASever(serversOcupados, tServicioServers, ti):
 
     return serversOcupados, tServicioServers
 
-# Definir parametros del sistema
-landa = 5
-mu = 5
-# s = 2
-# probArribos =  np.array([[1, 0.2],
-#                 [2, 0.3],
-#                 [3, 0.35],
-#                 [4, 0.15]])
-
-# probServicios =  np.array([[1, 0.35],
-#               [2, 0.40], 
-#               [3, 0.25]])
-
 def generarTiempoArribo():
     #Tarribo = generarEventoDiscreto(probArribos)
     Tarribo = np.random.exponential(1/landa)
@@ -56,12 +47,13 @@ def generarTiempoArribo():
 
 def generarTiempoServicio():
     #Tservicio = generarEventoDiscreto(probServicios)
+    # Tservicio = np.random.uniform(2,5)
     Tservicio = np.random.exponential(1/mu)
     return Tservicio
 
 def sim(s):
     # Definir parametros de la simulacion
-    T = 20
+    T = 5*60
     nSim = 2000
     
     # Crear variables necesarias
@@ -144,11 +136,11 @@ def sim(s):
     # print('')
 
     # Graficar canLtidad de personas en el sitema vs. tiempo
-    # plt.figure()
-    # plt.bar(tTicks,nPersonas)
-    # plt.xlabel('Tiempo (min)')
-    # plt.ylabel('Numero de personas')
-    # plt.show()
+    plt.figure()
+    plt.bar(tTicks,nPersonas)
+    plt.xlabel('Tiempo')
+    plt.ylabel('Numero de personas')
+    plt.show()
     
     return L, Lq
     
@@ -158,9 +150,9 @@ def monteCarlo(N, s):
     for j in range(N):
         L_sim[j], Lq_sim[j] = sim(s)
     
-    print(L_sim)
-    print(Lq_sim)
-    print('')
+    # print(L_sim)
+    # print(Lq_sim)
+    # print('')
     
     L_mc = np.mean(L_sim)
     Lq_mc = np.mean(Lq_sim)
@@ -170,7 +162,7 @@ def monteCarlo(N, s):
     
     return L_mc, Lq_mc
 
-monteCarlo(N = 30, s = 3)
+L_mc, Lq_mc = monteCarlo(N = 100, s = 1)
 
 
     
